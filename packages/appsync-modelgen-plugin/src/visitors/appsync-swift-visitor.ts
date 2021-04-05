@@ -54,6 +54,7 @@ export class AppSyncSwiftVisitor<
           variable: isVariable,
           isEnum: this.isEnumType(field),
           listType: field.isList ? listType : undefined,
+          isListNullable: field.isListNullable
         });
       });
       const initParams: CodeGenField[] = this.getWritableFields(obj);
@@ -81,6 +82,7 @@ export class AppSyncSwiftVisitor<
               isList: field.isList,
               isEnum: this.isEnumType(field),
               listType: field.isList ? listType : undefined,
+              isListNullable: field.isListNullable
             },
           };
         }),
@@ -145,6 +147,7 @@ export class AppSyncSwiftVisitor<
           variable: true,
           isEnum: this.isEnumType(field),
           listType: field.isList ? ListType.ARRAY : undefined,
+          isListNullable: field.isListNullable
         });
       });
       result.push(structBlock.string);
@@ -274,7 +277,8 @@ export class AppSyncSwiftVisitor<
     const name = `${modelKeysName}.${this.getFieldName(field)}`;
     const typeName = this.getSwiftModelTypeName(field);
     const { connectionInfo } = field;
-    const isRequired = this.isFieldRequired(field) ? '.required' : '.optional';
+    const isOptionalField = field.isList ? field.isListNullable : field.isNullable
+    const isRequired = !isOptionalField ? '.required' : '.optional';
     // connected field
     if (connectionInfo) {
       if (connectionInfo.kind === CodeGenConnectionType.HAS_MANY) {
