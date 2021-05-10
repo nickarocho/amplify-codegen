@@ -60,6 +60,13 @@ async function generateModels(context) {
     isTimestampFieldsAdded = false;
   }
 
+  let handleListNullabilityTransparently = false;
+  try {
+    handleListNullabilityTransparently = FeatureFlags.getBoolean('handleListNullabilityTransparently');
+  } catch (err) {
+    handleListNullabilityTransparently = false;
+  }
+
   const appsyncLocalConfig = await appSyncDataStoreCodeGen.preset.buildGeneratesSection({
     baseOutputDir: outputPath,
     schema,
@@ -67,6 +74,7 @@ async function generateModels(context) {
       target: platformToLanguageMap[projectConfig.frontend] || projectConfig.frontend,
       directives: directiveDefinitions,
       isTimestampFieldsAdded,
+      handleListNullabilityTransparently
     },
   });
 
